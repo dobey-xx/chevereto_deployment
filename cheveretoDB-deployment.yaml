@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: database
+  name: chevereto-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: chevereto
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chevereto-db
+                  key: mysql-password
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chevereto-db
+                  key: mysql-root-password
+              value: password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: chevereto-db
+                  key: mysql-username
+          image: mariadb:jammy
+          livenessProbe:
+            exec:
+              command:
+                - healthcheck.sh
+                - --su-mysql
+                - --connect
+            failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 5
+          ports:
+          - containerPort: 3306
+            name: mysql
+          name: chevereto-mysql
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: database
+      restartPolicy: Always
+      volumes:
+        - name: database
+          persistentVolumeClaim:
+            claimName: database

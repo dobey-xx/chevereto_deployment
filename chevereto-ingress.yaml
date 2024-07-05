@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
+  name: chevereto
+  namespace: chevereto
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: external.example.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: chevereto
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - external-example.org
+    secretName: chevereto-tls
+status:
+  loadBalancer:
+    ingress:
+    - ip: ip_of_your_lb

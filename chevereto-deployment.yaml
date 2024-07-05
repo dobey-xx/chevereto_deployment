@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chevereto
+  labels:
+    app: chevereto
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: chevereto
+  template:
+    metadata:
+      labels:
+        app: chevereto
+    spec:
+      containers:
+        - env:
+            - name: CHEVERETO_ASSET_STORAGE_BUCKET
+              value: /var/www/html/images/_assets/
+            - name: CHEVERETO_ASSET_STORAGE_TYPE
+              value: local
+            - name: CHEVERETO_ASSET_STORAGE_URL
+              value: /images/_assets/
+            - name: CHEVERETO_DB_HOST
+              value: chevereto-mysql
+            - name: CHEVERETO_DB_NAME
+              value: chevereto
+            - name: CHEVERETO_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: chevereto-db
+                  key: mysql-password
+            - name: CHEVERETO_DB_PORT
+              value: "3306"
+            - name: CHEVERETO_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: chevereto-db
+                  key: mysql-username
+            - name: CHEVERETO_MAX_POST_SIZE
+              value: 2G
+            - name: CHEVERETO_MAX_UPLOAD_SIZE
+              value: 2G
+            - name: CHEVERETO_SERVICING
+              value: server
+            - name: CHEVERETO_LICENSE_KEY
+              value: <<your_license_key>>
+          image: chevereto/chevereto:latest
+          name: chevereto
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/www/html/images
+              name: storage
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 33
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: chevereto
