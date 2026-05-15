@@ -1,7 +1,7 @@
 Currently it's only available to deploy as a docker container.
 I wanted to use it within my kubernetes playground so I've created these files to deploy it within kubernetes.
 
-I've already setup a Gateaway and Cert-Manager, so this deployment assumes you already have that.
+I've already setup a Gateway and Cert-Manager, so this deployment assumes you already have that.
 
 Run in the following order to be sure it's all happy
 1. run the pvc.yaml to create the 2 claims for the persistent storage, one is for your images and one is for your database
