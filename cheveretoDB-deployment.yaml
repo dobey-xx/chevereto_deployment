@@ -36,7 +36,7 @@ spec:
                 secretKeyRef:
                   name: chevereto-db
                   key: mysql-username
-          image: mariadb:jammy
+          image: mariadb:noble
           livenessProbe:
             exec:
               command:
